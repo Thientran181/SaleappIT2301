@@ -1,22 +1,9 @@
 from flask import Flask, render_template, request
 from unicodedata import category
-
-app = Flask(__name__)
-
+from eapp import dao, app
 
 @app.route("/")
 def index():
-    categories = [{
-        'id': 1,
-        'name': 'Mobile'
-    }, {
-        'id': 2,
-        'name': 'Tablet'
-    }, {
-        'id': 3,
-        'name': 'Laptop'
-    }]
-
     products = [{
         "id": 1,
         "name": "iPhone 7 Plus",
@@ -98,7 +85,7 @@ def index():
         products = [p for p in products if p['category_id'] == int(cate_id)]
 
 
-    return render_template('index.html', categories=categories, products=products)
+    return render_template('index.html', products=products)
 
 
 @app.route("/register")
@@ -110,6 +97,14 @@ def register():
 def login():
 
     return render_template('login.html')
+
+@app.context_processor
+def common_responses():
+    categories = dao.load_categories()
+
+    return {
+        'categories': categories
+    }
 
 if __name__ == '__main__':
     with app.app_context():
