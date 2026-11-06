@@ -1,8 +1,7 @@
 from email.policy import default
-from tkinter import Text
 from sqlalchemy.orm import relationship
-import nullable
-from sqlalchemy import column, String, Integer, Float, ForeignKey, Boolean, Column, false
+#import nullable
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, Boolean,Text, Column, false
 from unicodedata import category
 
 from eapp import db, app
@@ -10,21 +9,27 @@ from eapp import db, app
 
 class Category(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     product = relationship('Product', backref='category', lazy=True)
 
-class Product(db.model):
+    def __str__(self):
+        return self.name
+
+class Product(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
-    description = column(Text)
-    image = column(String(100))
-    price = column(Float, default=0)
-    active = column(Boolean, default=True)
-    category_id = column(Integer, ForeignKey(Category.id), nullable=False)
+    description = Column(Text)
+    image = Column(String(100))
+    price = Column(Float, default=0)
+    active = Column(Boolean, default=True)
+    category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
+
+    def __str__(self):
+        return self.name
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        # db.create_all()
 
         # c1 = Category(name='Mobile')
         # c2 = Category(name='Tablet')
@@ -107,7 +112,8 @@ if __name__ == '__main__':
         }]
 
         for p in products:
-            p1 = Product(name=p['name'], description = p['description'], price = p['price'], image=p['image'], category_id=['category_id'])
-
+            p1 = Product(name=p['name'], description = p['description'],
+                         price = p['price'], image=p['image'], category_id=p['category_id'])
             db.session.add(p1)
 
+        db.session.commit()
